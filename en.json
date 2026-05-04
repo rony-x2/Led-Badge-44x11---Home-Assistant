@@ -1,0 +1,22 @@
+{
+  "title": "LED Name Badge",
+  "config": {
+    "step": {
+      "user": {
+        "title": "Pick an LED badge",
+        "description": "Choose an LSLED badge that is currently in Bluetooth transfer mode. Press the top button twice on the badge to enable transfer mode.",
+        "data": {
+          "address": "Bluetooth address"
+        }
+      },
+      "bluetooth_confirm": {
+        "title": "Set up LED badge",
+        "description": "Add LSLED badge {name}?"
+      }
+    },
+    "abort": {
+      "no_devices_found": "No LSLED badge found. Press the top button on the badge twice to enable Bluetooth transfer mode and try again.",
+      "already_configured": "This badge is already configured."
+    }
+  }
+}

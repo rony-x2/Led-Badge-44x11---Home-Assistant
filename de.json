@@ -1,0 +1,22 @@
+{
+  "title": "LED-Badge",
+  "config": {
+    "step": {
+      "user": {
+        "title": "LED-Badge auswählen",
+        "description": "Wähle ein LSLED-Badge, das gerade im Bluetooth-Transfermodus ist. Drücke den oberen Knopf am Badge zweimal, um den Transfermodus zu aktivieren.",
+        "data": {
+          "address": "Bluetooth-Adresse"
+        }
+      },
+      "bluetooth_confirm": {
+        "title": "LED-Badge einrichten",
+        "description": "LSLED-Badge {name} hinzufügen?"
+      }
+    },
+    "abort": {
+      "no_devices_found": "Kein LSLED-Badge gefunden. Drücke den oberen Knopf am Badge zweimal, um den Bluetooth-Transfermodus zu aktivieren und versuche es erneut.",
+      "already_configured": "Dieses Badge ist bereits eingerichtet."
+    }
+  }
+}

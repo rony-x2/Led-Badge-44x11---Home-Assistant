@@ -1,0 +1,41 @@
+send:
+  name: An Badge senden
+  description: >
+    Rendert bis zu 8 Nachrichten und überträgt sie via Bluetooth an das
+    LED-Badge. Das Badge muss beim Service-Aufruf im
+    Bluetooth-Transfermodus sein (oberen Knopf 2× drücken, BT-Symbol
+    erscheint im Display).
+  fields:
+    address:
+      name: MAC-Adresse
+      description: >
+        Optional; nur nötig wenn du mehrere Badges eingerichtet hast.
+      example: "AA:BB:CC:DD:EE:FF"
+      selector:
+        text:
+    brightness:
+      name: Helligkeit
+      description: 1..100 — wird vom Badge auf 25/50/75/100 % gerundet.
+      default: 100
+      selector:
+        number:
+          min: 1
+          max: 100
+          unit_of_measurement: "%"
+    messages:
+      name: Nachrichten
+      description: >
+        Liste mit 1–8 Nachrichten. Jede Nachricht hat einen text (optional
+        mit :icon:-Tokens), ein mode, eine speed und Flags.
+        Built-in Icons: heart, wifi, bell, check, cross, warn, home,
+        smile, arrow_left, arrow_right, music, key, battery.
+        Eigene Icons: PNG nach /config/led_badge_icons/<name>.png legen.
+      required: true
+      example: |
+        - text: "Dennis :wifi:"
+          mode: left
+          speed: 5
+        - text: "WLAN: MyHomeNet"
+          mode: fixed
+      selector:
+        object:
