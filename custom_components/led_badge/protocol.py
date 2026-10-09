@@ -2,13 +2,13 @@
 
 Spec is reverse-engineered (see Nilhcem's blog post and
 https://github.com/fossasia/led-name-badge-ls32 for the USB/HID variant
-of the same protocol — the data format is identical, only the wire chunk
+of the same protocol - the data format is identical, only the wire chunk
 size differs: 16 bytes over BLE vs. 64 bytes over USB).
 
 Header layout (64 bytes, sent first as 4 BLE chunks):
     0..3   "wang" magic
     4      reserved (0x00)
-    5      brightness flag: 0x00=100%, 0x10=75%, 0x20=50%, 0x30=25%
+    5      brightness flag: 0x00=100%, 0x10=75%, 0x20=50%, 0x40=25%
     6      blink  flags, bit i = blink for message i
     7      marquee flags, bit i = marquee for message i
     8..15  speed (high nibble, 0..7) | mode (low nibble, 0..8) per message
@@ -22,6 +22,8 @@ chunks, last one zero-padded):
     For each 8-pixel-wide "byte-column" of the rendered scene we emit
     DISPLAY_HEIGHT bytes (one per row, MSB = leftmost pixel).
     `length` in the header is the number of those byte-columns.
+
+The badge stores at most MAX_PAYLOAD_BYTES (header + bitmaps) in total.
 """
 from __future__ import annotations
 
@@ -29,6 +31,9 @@ import datetime as dt
 from typing import Iterable
 
 from .const import CHUNK_SIZE, DISPLAY_HEIGHT
+
+HEADER_SIZE = 64
+MAX_PAYLOAD_BYTES = 8192  # flash size of the badge, see led-name-badge-ls32
 
 
 def _pad(seq, default, n: int = 8) -> list:
@@ -55,10 +60,11 @@ def build_header(
     blinks = _pad(blinks, False)
     marquees = _pad(marquees, False)
 
-    h = bytearray(64)
+    h = bytearray(HEADER_SIZE)
     h[0:4] = b"wang"
 
-    # Brightness: 4 discrete levels
+    # Brightness: 4 discrete levels (rounded to the nearest level, values
+    # as in fossasia/led-name-badge-ls32)
     b = max(0, min(100, int(brightness)))
     if b >= 88:
         h[5] = 0x00
@@ -67,7 +73,7 @@ def build_header(
     elif b >= 38:
         h[5] = 0x20
     else:
-        h[5] = 0x30
+        h[5] = 0x40
 
     h[6] = sum(1 << i for i, v in enumerate(blinks) if v) & 0xFF
     h[7] = sum(1 << i for i, v in enumerate(marquees) if v) & 0xFF

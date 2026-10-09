@@ -15,12 +15,14 @@ send:
         text:
     brightness:
       name: Helligkeit
-      description: 1..100 — wird vom Badge auf 25/50/75/100 % gerundet.
+      description: 1..100 – wird vom Badge auf 25/50/75/100 % gerundet.
       default: 100
       selector:
         number:
           min: 1
           max: 100
+          step: 1
+          mode: slider
           unit_of_measurement: "%"
     messages:
       name: Nachrichten
@@ -30,6 +32,7 @@ send:
         Built-in Icons: heart, wifi, bell, check, cross, warn, home,
         smile, arrow_left, arrow_right, music, key, battery.
         Eigene Icons: PNG nach /config/led_badge_icons/<name>.png legen.
+        Modi: left, right, up, down, fixed, anim, drop, curtain, laser.
       required: true
       example: |
         - text: "Dennis :wifi:"

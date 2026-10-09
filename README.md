@@ -1,4 +1,4 @@
-# LED Name Badge — Home Assistant Custom Integration
+# LED Name Badge – Home Assistant Custom Integration
 
 Eine kleine Custom Integration für Home Assistant, die das **LSLED-LED-Namensschild**
 (BLE-Variante, 11×44 Pixel, kompatibel mit der FOSSASIA `badgemagic-app`) per
@@ -6,24 +6,34 @@ Bluetooth ansteuert. Der HA-Bluetooth-Stack wird verwendet, sodass die
 Verbindung automatisch über deinen **ESPHome-BT-Proxy** läuft, wenn dieser
 in Reichweite und im **active mode** konfiguriert ist.
 
+Für die Bedienung im Dashboard gibt es eine passende Karte:
+[Led-Badge – Home Assistant Lovelace Card](https://github.com/rony-x2/Led-Badge---Home-Assistant-Lovelace-Card-).
+
 ## Voraussetzungen
 
-- Home Assistant OS (oder Container/Core) mit aktivierter Bluetooth-Integration
-- Mindestens ein BT-Adapter — Stick lokal **oder** ein ESPHome-BT-Proxy:
+- Home Assistant 2024.4 oder neuer mit aktivierter Bluetooth-Integration (für die `action:`-Schreibweise in den Beispielen: 2024.8)
+- Mindestens ein BT-Adapter – Stick lokal **oder** ein ESPHome-BT-Proxy:
   ```yaml
   # esphome config (Auszug)
   bluetooth_proxy:
     active: true   # WICHTIG: Schreibvorgänge brauchen active mode
   ```
 
-## Installation auf HAOS
+## Installation
 
-1. Per **Samba**, **File Editor**-Add-on oder **SSH** in dein HAOS einsteigen.
-2. Den kompletten Ordner `led_badge/` nach
-   ```
-   /config/custom_components/led_badge/
-   ```
-   kopieren. Die Verzeichnisstruktur muss am Ende so aussehen:
+### Über HACS (empfohlen)
+
+1. HACS → Menü (⋮) → **Benutzerdefinierte Repositories**
+2. URL `https://github.com/rony-x2/Led-Badge-44x11---Home-Assistant`
+   eintragen, Typ **Integration**, hinzufügen.
+3. „LED Name Badge (LSLED)“ in HACS herunterladen.
+4. **Home Assistant neu starten**.
+
+### Manuell
+
+1. Per **Samba**, **File Editor**-Add-on oder **SSH** auf deine HA-Konfiguration zugreifen.
+2. Den Ordner `custom_components/led_badge/` aus diesem Repository nach
+   `/config/custom_components/led_badge/` kopieren. Die Struktur muss am Ende so aussehen:
    ```
    /config/custom_components/led_badge/
    ├── __init__.py
@@ -44,24 +54,24 @@ in Reichweite und im **active mode** konfiguriert ist.
 ## Einrichtung
 
 1. Das Badge einschalten (oberer Knopf 1×).
-2. Den oberen Knopf **nochmal** drücken — das Bluetooth-Symbol erscheint im Display.
-   *Nur in diesem Modus advertised das Badge und ist verbindbar.*
+2. Den oberen Knopf **nochmal** drücken – das Bluetooth-Symbol erscheint im Display.
+   *Nur in diesem Modus sendet das Badge Advertisements und ist verbindbar.*
 3. In HA: `Einstellungen` → `Geräte & Dienste` → `Integration hinzufügen` → **LED Name Badge**.
 4. Das Badge sollte in der Liste auftauchen (oder per Auto-Discovery vorgeschlagen werden). Auswählen, fertig.
 
-> Wenn der HA-Discovery nicht greift, einfach beim Einrichtungs-Dialog manuell
-> aus der Dropdown-Liste auswählen — die Liste enthält alle gerade
+> Wenn die automatische Erkennung nicht greift, einfach im Einrichtungsdialog
+> manuell aus der Dropdown-Liste auswählen – die Liste enthält alle gerade
 > sichtbaren `LSLED`-Geräte.
 
-## Service `led_badge.send`
+## Aktion `led_badge.send`
 
 ```yaml
-service: led_badge.send
+action: led_badge.send
 data:
   brightness: 75
   messages:
     - text: "Dennis :wifi:"
-      mode: left          # scrollt — empfohlen wenn Text >44 px breit
+      mode: left          # scrollt – empfohlen, wenn der Text breiter als 44 px ist
       speed: 5
     - text: "WLAN: MyHomeNet"
       mode: fixed
@@ -72,16 +82,16 @@ data:
 
 ### Felder
 
-| Feld           | Typ          | Default  | Bedeutung |
-|----------------|--------------|----------|-----------|
-| `address`      | string       | optional | MAC der Badge; nur nötig wenn mehrere konfiguriert sind |
-| `brightness`   | 1–100        | 100      | wird auf 25/50/75/100 % gerundet (Hardware-Stufen) |
-| `messages`     | Liste 1–8    | required | siehe unten |
-| → `text`       | string       | required | beliebiger Text + `:icon:`-Tokens |
-| → `mode`       | name oder 0–8| `left`   | `left`, `right`, `up`, `down`, `fixed`, `anim`, `drop`, `curtain`, `laser` |
-| → `speed`      | 1–8          | 4        | 1 = langsamst, 8 = schnellst |
-| → `blink`      | bool         | false    | Nachricht blinkt |
-| → `marquee`    | bool         | false    | Lauflicht-Rahmen um die Nachricht |
+| Feld           | Typ           | Default  | Bedeutung |
+|----------------|---------------|----------|-----------|
+| `address`      | string        | optional | MAC-Adresse des Badges; Pflicht, sobald mehrere Badges eingerichtet sind |
+| `brightness`   | 1–100         | 100      | wird auf 25/50/75/100 % gerundet (Hardware-Stufen) |
+| `messages`     | Liste 1–8     | required | siehe unten |
+| → `text`       | string        | required | beliebiger Text + `:icon:`-Tokens |
+| → `mode`       | Name oder 0–8 | `left`   | `left`, `right`, `up`, `down`, `fixed`, `anim`, `drop`, `curtain`, `laser` |
+| → `speed`      | 1–8           | 4        | 1 = am langsamsten, 8 = am schnellsten |
+| → `blink`      | bool          | false    | Nachricht blinkt |
+| → `marquee`    | bool          | false    | Lauflicht-Rahmen um die Nachricht |
 
 ### Icon-Syntax
 
@@ -90,20 +100,33 @@ Im Text `:name:` schreiben, z. B. `Hi :heart: Welt`.
 **Built-in:** `heart`, `wifi`, `bell`, `check`, `cross`, `warn`, `home`,
 `smile`, `arrow_left`, `arrow_right`, `music`, `key`, `battery`.
 
-**Eigene Icons:** PNG (oder BMP/GIF) nach
-`/config/led_badge_icons/<name>.png` legen — wird automatisch auf 11 px Höhe
-skaliert. Dann via `:<name>:` im Text einbinden.
+**Eigene Icons:** PNG (oder BMP/GIF) nach `/config/led_badge_icons/<name>.png`
+legen und via `:<name>:` im Text einbinden. Bilder, die höher als 11 px sind,
+werden auf 11 px verkleinert, niedrigere vertikal zentriert. Helle Pixel
+leuchten, dunkle und transparente bleiben aus. Unbekannte Icon-Namen werden
+als Text angezeigt, damit Tippfehler auffallen.
 
-## Typischer Workflow für deinen Use Case
+### Schrift
 
-`input_text`-Helper für Name + WLAN-SSID + WLAN-PSK anlegen, Skript darüber:
+Der Text wird mit **DejaVu Sans Bold** gerendert (Fallback: DejaVu Sans,
+DejaVu Sans Mono), die Schriftgröße wird automatisch so gewählt, dass
+Umlaute und Unterlängen in die 11 Pixel passen.
+
+Ist keine DejaVu-Schrift installiert, fällt die Integration auf die
+Standardschrift von Pillow zurück – die kennt allerdings **keine Umlaute**.
+In dem Fall eine beliebige TrueType-Schrift als
+`/config/led_badge_font.ttf` ablegen und Home Assistant neu starten.
+
+## Beispiel: Name und WLAN-Zugang anzeigen
+
+`input_text`-Helfer für Name, WLAN-SSID und WLAN-Passwort anlegen, Skript darüber:
 
 ```yaml
 # scripts.yaml
 update_badge:
   alias: Badge aktualisieren
   sequence:
-    - service: led_badge.send
+    - action: led_badge.send
       data:
         brightness: 75
         messages:
@@ -118,24 +141,21 @@ update_badge:
             speed: 5
 ```
 
-Auf dem Dashboard ein Button auf das Skript binden. Workflow am Badge:
-Knopf-Knopf → BT-Symbol → Button drücken → fertig.
+Auf dem Dashboard einen Button auf das Skript legen. Ablauf am Badge:
+Knopf, Knopf → BT-Symbol → Button drücken → fertig.
 
 ## Bekannte Einschränkungen
 
-- Das Badge advertised **nur im BT-Modus** — automatische Hintergrund-Updates
-  ohne Tastendruck sind nicht möglich.
-- Helligkeit hat firmwareseitig nur 4 Stufen.
-- Bei sehr langen Nachrichten (>~150 byte-columns) kann die Hardware
-  Speichergrenzen erreichen — keine harte Doku gefunden, ggf. ausprobieren.
-- Der mitgelieferte Default-Font versucht zuerst **DejaVu Sans Mono** zu
-  finden. Ist dieser auf HAOS nicht installiert, wird auf den Pillow-
-  Default-Font zurückgefallen (ca. 10 px hoch statt 11). Optisch nicht ganz
-  so randvoll, aber lesbar.
+- Das Badge ist **nur im BT-Modus** erreichbar – automatische
+  Hintergrund-Updates ohne Tastendruck sind nicht möglich.
+- Die Helligkeit hat firmwareseitig nur 4 Stufen.
+- Der Speicher des Badges fasst insgesamt 8 KB. Alle Nachrichten zusammen
+  dürfen daher höchstens etwa 5.900 Pixel breit sein; längere Texte lehnt
+  die Aktion mit einer Fehlermeldung ab.
 
 ## Debugging
 
-Im `configuration.yaml`:
+In der `configuration.yaml`:
 
 ```yaml
 logger:
@@ -144,12 +164,23 @@ logger:
     custom_components.led_badge: debug
 ```
 
-Dann zeigt der Log nach jedem `led_badge.send`-Aufruf die Anzahl Bytes und
-BLE-Chunks, sowie alle Connect-Fehlermeldungen.
+Dann zeigt das Log nach jedem `led_badge.send`-Aufruf die Anzahl Bytes und
+BLE-Chunks, die verwendete Schrift sowie alle Verbindungsfehler.
+
+## Entwicklung
+
+```bash
+pip install -r requirements_test.txt
+pytest
+```
 
 ## Spec-Quellen / Credits
 
-- Reverse Engineering: Gautier "Nilhcem" Mechling — http://nilhcem.com/iot/reverse-engineering-bluetooth-led-name-badge
+- Reverse Engineering: Gautier „Nilhcem“ Mechling – http://nilhcem.com/iot/reverse-engineering-bluetooth-led-name-badge
 - Referenz-Implementierung (USB/HID, identisches Datenformat): https://github.com/fossasia/led-name-badge-ls32
 - Original-App: https://github.com/fossasia/badgemagic-app
 - Hardware-Doku & UUIDs: https://github.com/fossasia/badgemagic-firmware
+
+## Lizenz
+
+GPL-3.0 – siehe [LICENSE](LICENSE). © 2026 Dennis Deutschkämer

@@ -16,7 +16,7 @@ CHUNK_SIZE = 16  # BLE writes are 16-byte chunks
 SERVICE_SEND = "send"
 
 # Animation modes (matching the reverse-engineered firmware protocol)
-MODE_LEFT = 0     # scroll left  – use this for long text
+MODE_LEFT = 0     # scroll left - use this for long text
 MODE_RIGHT = 1
 MODE_UP = 2
 MODE_DOWN = 3
@@ -27,6 +27,18 @@ MODE_CURTAIN = 7
 MODE_LASER = 8
 
 VALID_MODES = list(range(9))
+
+MODE_NAMES = {
+    "left": MODE_LEFT,
+    "right": MODE_RIGHT,
+    "up": MODE_UP,
+    "down": MODE_DOWN,
+    "fixed": MODE_FIXED,
+    "anim": MODE_ANIM,
+    "drop": MODE_DROP,
+    "curtain": MODE_CURTAIN,
+    "laser": MODE_LASER,
+}
 
 DEFAULT_MODE = MODE_LEFT
 DEFAULT_SPEED = 4
